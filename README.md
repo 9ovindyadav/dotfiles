@@ -4,7 +4,23 @@
 1. GNU Stow
 2. Git
 
-## Setup
+```bash
+sudo apt install git stow
+```
+
+## Installation
 1. Clone the `dotfiles` repo in the `$HOME` directory
-2. `cd dotfiles`
-3. Run `stow .` to simlink all the files
+```bash
+git clone 
+cd dotfiles
+```
+2. Run `stow .` to simlink all the files
+```bash
+stow .
+```
+
+## Note
+- `dotfiles` file structure should be same as it is in `$HOME` directory
+
+## Material
+- [Dotfiles YouTube Video](https://youtu.be/y6XCebnB9gs?si=nGOn4nvUNb2ZLYp5)

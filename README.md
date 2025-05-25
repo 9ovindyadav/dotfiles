@@ -6,4 +6,5 @@
 
 ## Setup
 1. Clone the `dotfiles` repo in the `$HOME` directory
-2. Run `stow .` to simlink all the files
+2. `cd dotfiles`
+3. Run `stow .` to simlink all the files

@@ -5,7 +5,7 @@
 2. Git
 
 ```bash
-sudo apt install git stow
+sudo apt install git stow xclip
 ```
 
 ## Installation

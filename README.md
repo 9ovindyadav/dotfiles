@@ -5,7 +5,7 @@
 2. Git
 
 ```bash
-sudo apt install git stow xclip
+sudo apt install git stow xclip fzf
 ```
 
 ## Installation

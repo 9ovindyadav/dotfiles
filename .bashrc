@@ -111,4 +111,7 @@ export SDKMAN_DIR="$HOME/.sdkman"
 # Golang path
 export PATH=$PATH:/usr/local/go/bin
 export PATH=$PATH:~/go/bin
+
+export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
 . "$HOME/.cargo/env"
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"

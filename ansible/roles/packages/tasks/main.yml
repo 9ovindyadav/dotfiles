@@ -17,6 +17,14 @@
       - fzf
       - build-essential
       - unzip
+      - zip
       - podman
+      - jq
+      - htop
+      - rsync
+      - ccache
+      - cmake
+      - gnupg
+      - openssh-client
     state: present
   become: true

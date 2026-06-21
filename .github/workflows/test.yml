@@ -46,7 +46,7 @@ jobs:
       - name: Run playbook (packages + dotfiles only)
         run: |
           cd ~/dotfiles
-          ansible-playbook ansible/playbook.yml --skip-tags tools
+          ansible-playbook ansible/playbook.yml --skip-tags tools,apps
 
       - name: Verify symlinks
         run: |

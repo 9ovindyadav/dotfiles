@@ -8,3 +8,5 @@
       tags: dotfiles
     - role: tools
       tags: tools
+    - role: apps
+      tags: apps

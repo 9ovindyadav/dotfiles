@@ -4,14 +4,14 @@
     creates: "{{ ansible_env.HOME }}/.nvm/nvm.sh"
   changed_when: true
 
-- name: Check if Node {{ tools_node_version }} is installed
+- name: Check if Node is installed - {{ tools_node_version }}
   ansible.builtin.find:
     paths: "{{ ansible_env.HOME }}/.nvm/versions/node"
     patterns: "v{{ tools_node_version }}*"
     file_type: directory
   register: tools_node_dirs
 
-- name: Install Node {{ tools_node_version }} via NVM
+- name: Install Node via NVM - {{ tools_node_version }}
   ansible.builtin.shell:
     cmd: |
       source {{ ansible_env.HOME }}/.nvm/nvm.sh
@@ -27,12 +27,12 @@
     creates: "{{ ansible_env.HOME }}/.sdkman/bin/sdkman-init.sh"
   changed_when: true
 
-- name: Check if Java {{ tools_java_version }} is installed
+- name: Check if Java is installed - {{ tools_java_version }}
   ansible.builtin.stat:
     path: "{{ ansible_env.HOME }}/.sdkman/candidates/java/{{ tools_java_version }}"
   register: tools_java_dir
 
-- name: Install Java {{ tools_java_version }} via SDKMAN
+- name: Install Java via SDKMAN - {{ tools_java_version }}
   ansible.builtin.shell:
     cmd: |
       source {{ ansible_env.HOME }}/.sdkman/bin/sdkman-init.sh
@@ -132,7 +132,11 @@
 
 - name: Set k9s download URL
   ansible.builtin.set_fact:
-    tools_k9s_url: "{{ tools_k9s_release.json.assets | selectattr('name', 'equalto', 'k9s_Linux_amd64.tar.gz') | map(attribute='browser_download_url') | first }}"
+    tools_k9s_url: >-
+      {{ tools_k9s_release.json.assets
+         | selectattr('name', 'equalto', 'k9s_Linux_amd64.tar.gz')
+         | map(attribute='browser_download_url')
+         | first }}
   when: not tools_k9s_binary.stat.exists
 
 - name: Download k9s

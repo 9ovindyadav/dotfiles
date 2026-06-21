@@ -5,7 +5,7 @@ Personal dotfiles for Ubuntu, managed with GNU Stow and bootstrapped with Ansibl
 ## Bootstrap (fresh Ubuntu machine)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/govindsvyadav/dotfiles/main/bootstrap.sh | bash
+curl -fsSL https://raw.githubusercontent.com/9ovindyadav/dotfiles/main/bootstrap.sh | bash
 ```
 
 This will:

@@ -1,12 +1,16 @@
+- name: Detect system architecture
+  ansible.builtin.set_fact:
+    tools_arch: "{{ 'arm64' if ansible_facts['architecture'] == 'aarch64' else 'amd64' }}"
+
 - name: Install NVM  # noqa: command-instead-of-module risky-shell-pipe
   ansible.builtin.shell:
     cmd: curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-    creates: "{{ ansible_env.HOME }}/.nvm/nvm.sh"
+    creates: "{{ ansible_facts['env']['HOME'] }}/.nvm/nvm.sh"
   changed_when: true
 
 - name: Check if Node is installed - {{ tools_node_version }}
   ansible.builtin.find:
-    paths: "{{ ansible_env.HOME }}/.nvm/versions/node"
+    paths: "{{ ansible_facts['env']['HOME'] }}/.nvm/versions/node"
     patterns: "v{{ tools_node_version }}*"
     file_type: directory
   register: tools_node_dirs
@@ -14,7 +18,7 @@
 - name: Install Node via NVM - {{ tools_node_version }}
   ansible.builtin.shell:
     cmd: |
-      source {{ ansible_env.HOME }}/.nvm/nvm.sh
+      source {{ ansible_facts['env']['HOME'] }}/.nvm/nvm.sh
       nvm install {{ tools_node_version }}
       nvm alias default {{ tools_node_version }}
     executable: /bin/bash
@@ -24,18 +28,18 @@
 - name: Install SDKMAN  # noqa: command-instead-of-module risky-shell-pipe
   ansible.builtin.shell:
     cmd: curl -s "https://get.sdkman.io" | bash
-    creates: "{{ ansible_env.HOME }}/.sdkman/bin/sdkman-init.sh"
+    creates: "{{ ansible_facts['env']['HOME'] }}/.sdkman/bin/sdkman-init.sh"
   changed_when: true
 
 - name: Check if Java is installed - {{ tools_java_version }}
   ansible.builtin.stat:
-    path: "{{ ansible_env.HOME }}/.sdkman/candidates/java/{{ tools_java_version }}"
+    path: "{{ ansible_facts['env']['HOME'] }}/.sdkman/candidates/java/{{ tools_java_version }}"
   register: tools_java_dir
 
 - name: Install Java via SDKMAN - {{ tools_java_version }}
   ansible.builtin.shell:
     cmd: |
-      source {{ ansible_env.HOME }}/.sdkman/bin/sdkman-init.sh
+      source {{ ansible_facts['env']['HOME'] }}/.sdkman/bin/sdkman-init.sh
       sdk install java {{ tools_java_version }}
     executable: /bin/bash
   changed_when: true
@@ -48,7 +52,7 @@
 
 - name: Download Go {{ tools_go_version }}
   ansible.builtin.get_url:
-    url: "https://go.dev/dl/go{{ tools_go_version }}.linux-amd64.tar.gz"
+    url: "https://go.dev/dl/go{{ tools_go_version }}.linux-{{ tools_arch }}.tar.gz"
     dest: /tmp/go.tar.gz
     mode: '0644'
   become: true
@@ -65,7 +69,7 @@
 - name: Install TPM  # noqa: latest[git]
   ansible.builtin.git:
     repo: https://github.com/tmux-plugins/tpm
-    dest: "{{ ansible_env.HOME }}/.tmux/plugins/tpm"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.tmux/plugins/tpm"
     update: false
 
 - name: Check if Docker is installed
@@ -82,7 +86,7 @@
 
 - name: Add user to docker group
   ansible.builtin.user:
-    name: "{{ ansible_env.USER }}"
+    name: "{{ ansible_facts['env']['USER'] }}"
     groups: docker
     append: true
   become: true
@@ -101,7 +105,7 @@
 
 - name: Install kubectl
   ansible.builtin.get_url:
-    url: "https://dl.k8s.io/release/{{ tools_kubectl_stable_version.content | trim }}/bin/linux/amd64/kubectl"
+    url: "https://dl.k8s.io/release/{{ tools_kubectl_stable_version.content | trim }}/bin/linux/{{ tools_arch }}/kubectl"
     dest: /usr/local/bin/kubectl
     mode: '0755'
   become: true
@@ -134,7 +138,7 @@
   ansible.builtin.set_fact:
     tools_k9s_url: >-
       {{ tools_k9s_release.json.assets
-         | selectattr('name', 'equalto', 'k9s_Linux_amd64.tar.gz')
+         | selectattr('name', 'equalto', 'k9s_Linux_' + tools_arch + '.tar.gz')
          | map(attribute='browser_download_url')
          | first }}
   when: not tools_k9s_binary.stat.exists

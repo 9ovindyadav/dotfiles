@@ -5,6 +5,9 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  schedule:
+    - cron: '0 0 * * 0'  # every Sunday midnight UTC
+  workflow_dispatch:
 
 jobs:
   lint:
@@ -54,3 +57,41 @@ jobs:
           test -L ~/.vimrc     && echo "ok .vimrc"
           test -L ~/.tmux.conf && echo "ok .tmux.conf"
           test -L ~/.gitconfig && echo "ok .gitconfig"
+
+  tools:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Copy repo to ~/dotfiles
+        run: cp -r $GITHUB_WORKSPACE ~/dotfiles
+
+      - name: Install Ansible and Stow
+        run: sudo apt update && sudo apt install -y ansible stow
+
+      - name: Remove default conflicting dotfiles
+        run: rm -f ~/.bashrc ~/.vimrc ~/.tmux.conf ~/.gitconfig
+
+      - name: Run full playbook
+        run: |
+          cd ~/dotfiles
+          ansible-playbook ansible/playbook.yml
+
+      - name: Verify symlinks
+        run: |
+          test -L ~/.bashrc    && echo "ok .bashrc"
+          test -L ~/.vimrc     && echo "ok .vimrc"
+          test -L ~/.tmux.conf && echo "ok .tmux.conf"
+          test -L ~/.gitconfig && echo "ok .gitconfig"
+
+      - name: Verify tools
+        run: |
+          source ~/.nvm/nvm.sh && node --version  && echo "ok node"
+          source ~/.sdkman/bin/sdkman-init.sh && java --version && echo "ok java"
+          /usr/local/go/bin/go version              && echo "ok go"
+          helm version                              && echo "ok helm"
+          kubectl version --client                  && echo "ok kubectl"
+          k9s version                               && echo "ok k9s"
+          tmux -V                                   && echo "ok tmux"
+          vim --version | head -1                   && echo "ok vim"

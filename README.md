@@ -1,6 +1,6 @@
 # dotfiles
 
-Personal dotfiles and machine bootstrap for development, managed with GNU Stow and Ansible.
+A developer-focused dotfiles and machine bootstrap toolkit. Clone it on a fresh machine and get a fully configured development environment in minutes — shell, editor, terminal multiplexer, Kubernetes tools, runtimes, and apps all set up automatically via Ansible. Designed to be reusable across teams so any developer can onboard a new machine without manual setup.
 
 ## Bootstrap
 

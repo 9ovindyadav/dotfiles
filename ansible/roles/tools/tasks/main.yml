@@ -1,0 +1,104 @@
+- name: Install NVM
+  shell: curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+  args:
+    creates: "{{ ansible_env.HOME }}/.nvm/nvm.sh"
+
+- name: Install Node via NVM
+  shell: |
+    source {{ ansible_env.HOME }}/.nvm/nvm.sh
+    nvm install {{ node_version }}
+    nvm alias default {{ node_version }}
+  args:
+    executable: /bin/bash
+
+- name: Install SDKMAN
+  shell: curl -s "https://get.sdkman.io" | bash
+  args:
+    creates: "{{ ansible_env.HOME }}/.sdkman/bin/sdkman-init.sh"
+
+- name: Install Java via SDKMAN
+  shell: |
+    source {{ ansible_env.HOME }}/.sdkman/bin/sdkman-init.sh
+    sdk install java {{ java_version }}
+  args:
+    executable: /bin/bash
+
+- name: Check if Go is installed
+  stat:
+    path: /usr/local/go/bin/go
+  register: go_binary
+
+- name: Download Go tarball
+  become: true
+  get_url:
+    url: "https://go.dev/dl/go{{ go_version }}.linux-amd64.tar.gz"
+    dest: /tmp/go.tar.gz
+  when: not go_binary.stat.exists
+
+- name: Extract Go
+  become: true
+  unarchive:
+    src: /tmp/go.tar.gz
+    dest: /usr/local
+    remote_src: true
+  when: not go_binary.stat.exists
+
+- name: Install TPM
+  git:
+    repo: https://github.com/tmux-plugins/tpm
+    dest: "{{ ansible_env.HOME }}/.tmux/plugins/tpm"
+    update: false
+
+- name: Check if Docker is installed
+  stat:
+    path: /usr/bin/docker
+  register: docker_binary
+
+- name: Install Docker
+  become: true
+  shell: curl -fsSL https://get.docker.com | sh
+  when: not docker_binary.stat.exists
+
+- name: Add user to docker group
+  become: true
+  user:
+    name: "{{ ansible_env.USER }}"
+    groups: docker
+    append: true
+
+- name: Check if kubectl is installed
+  stat:
+    path: /usr/local/bin/kubectl
+  register: kubectl_binary
+
+- name: Install kubectl
+  become: true
+  shell: |
+    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+    install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+    rm kubectl
+  when: not kubectl_binary.stat.exists
+
+- name: Check if Helm is installed
+  stat:
+    path: /usr/local/bin/helm
+  register: helm_binary
+
+- name: Install Helm
+  become: true
+  shell: curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+  when: not helm_binary.stat.exists
+
+- name: Check if k9s is installed
+  stat:
+    path: /usr/local/bin/k9s
+  register: k9s_binary
+
+- name: Install k9s
+  become: true
+  shell: |
+    curl -sL $(curl -s https://api.github.com/repos/derailed/k9s/releases/latest \
+      | grep "browser_download_url.*Linux_amd64.tar.gz" \
+      | cut -d '"' -f 4) | tar xz -C /tmp
+    mv /tmp/k9s /usr/local/bin/k9s
+  when: not k9s_binary.stat.exists

@@ -13,34 +13,14 @@
     path: /usr/bin/brave-browser
   register: apps_brave_binary
 
-- name: Download Brave apt key
-  ansible.builtin.get_url:
-    url: https://brave-keyring.apt.brave.com/brave-browser-archive-keyring.gpg
-    dest: /usr/share/keyrings/brave-browser-archive-keyring.gpg
-    mode: '0644'
+- name: Install Brave  # noqa: command-instead-of-module risky-shell-pipe
+  ansible.builtin.shell:
+    cmd: curl -fsS https://dl.brave.com/install.sh | sh
+    creates: /usr/bin/brave-browser
   become: true
+  changed_when: true
   retries: 3
   delay: 10
-  when: not apps_brave_binary.stat.exists
-
-- name: Add Brave apt repo
-  ansible.builtin.deb822_repository:
-    name: brave-browser
-    types: deb
-    uris: https://brave-keyring.apt.brave.com/
-    suites: stable
-    components: main
-    architectures: "{{ apps_arch }}"
-    signed_by: /usr/share/keyrings/brave-browser-archive-keyring.gpg
-    state: present
-  become: true
-  when: not apps_brave_binary.stat.exists
-
-- name: Install Brave
-  ansible.builtin.apt:
-    name: brave-browser
-    update_cache: true
-  become: true
   when: not apps_brave_binary.stat.exists
 
 - name: Check if Bitwarden is installed

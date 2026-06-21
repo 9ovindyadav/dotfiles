@@ -4,7 +4,7 @@
   roles:
     - role: packages
       tags: packages
-    - role: tools
-      tags: tools
     - role: dotfiles
       tags: dotfiles
+    - role: tools
+      tags: tools

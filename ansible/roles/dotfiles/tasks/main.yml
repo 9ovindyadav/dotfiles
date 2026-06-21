@@ -1,4 +1,5 @@
 - name: Stow dotfiles
-  shell: stow .
-  args:
+  ansible.builtin.command:
+    cmd: stow .
     chdir: "{{ ansible_env.HOME }}/dotfiles"
+  changed_when: true

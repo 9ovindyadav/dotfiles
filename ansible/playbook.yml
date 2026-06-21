@@ -1,4 +1,5 @@
-- hosts: localhost
+- name: Setup development environment
+  hosts: localhost
   connection: local
   roles:
     - role: packages

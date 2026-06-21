@@ -1,12 +1,11 @@
 - name: Update apt cache
-  become: true
-  apt:
+  ansible.builtin.apt:
     update_cache: true
     cache_valid_time: 3600
+  become: true
 
 - name: Install packages
-  become: true
-  apt:
+  ansible.builtin.apt:
     name:
       - git
       - stow
@@ -20,3 +19,4 @@
       - unzip
       - podman
     state: present
+  become: true

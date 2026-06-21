@@ -1,3 +1,5 @@
+# shellcheck shell=bash
+# shellcheck disable=SC1091
 case $- in
     *i*) ;;
       *) return;;

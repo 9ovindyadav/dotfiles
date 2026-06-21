@@ -28,21 +28,9 @@
     path: /usr/bin/bitwarden
   register: apps_bitwarden_binary
 
-- name: Get Bitwarden latest release info
-  ansible.builtin.uri:
-    url: https://api.github.com/repos/bitwarden/clients/releases/latest
-  register: apps_bitwarden_release
-  retries: 3
-  delay: 10
-  when: not apps_bitwarden_binary.stat.exists
-
 - name: Download Bitwarden deb
   ansible.builtin.get_url:
-    url: >-
-      {{ apps_bitwarden_release.json.assets
-         | selectattr('name', 'match', 'Bitwarden-.*-' + apps_arch + '\.deb')
-         | map(attribute='browser_download_url')
-         | first }}
+    url: https://bitwarden.com/download/?app=desktop&platform=linux&variant=deb
     dest: /tmp/bitwarden.deb
     mode: '0644'
   retries: 3

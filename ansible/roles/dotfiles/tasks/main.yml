@@ -1,3 +1,13 @@
+- name: Remove default conflicting dotfiles
+  ansible.builtin.file:
+    path: "{{ ansible_facts['env']['HOME'] }}/{{ item }}"
+    state: absent
+  loop:
+    - .bashrc
+    - .vimrc
+    - .tmux.conf
+    - .gitconfig
+
 - name: Stow dotfiles
   ansible.builtin.command:
     cmd: stow .

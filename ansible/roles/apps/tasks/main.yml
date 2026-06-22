@@ -56,6 +56,26 @@
   delay: 10
   when: not apps_zed_binary.stat.exists
 
+- name: Check if Google Chrome is installed
+  ansible.builtin.stat:
+    path: /usr/bin/google-chrome-stable
+  register: apps_chrome_binary
+
+- name: Download Google Chrome deb
+  ansible.builtin.get_url:
+    url: "https://dl.google.com/linux/direct/google-chrome-stable_current_{{ apps_arch }}.deb"
+    dest: /tmp/google-chrome.deb
+    mode: '0644'
+  retries: 3
+  delay: 10
+  when: not apps_chrome_binary.stat.exists
+
+- name: Install Google Chrome deb
+  ansible.builtin.apt:
+    deb: /tmp/google-chrome.deb
+  become: true
+  when: not apps_chrome_binary.stat.exists
+
 - name: Check if Sublime Merge is installed
   ansible.builtin.stat:
     path: /usr/bin/smerge

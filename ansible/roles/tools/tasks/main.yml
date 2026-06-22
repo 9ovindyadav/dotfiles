@@ -72,6 +72,11 @@
     dest: "{{ ansible_facts['env']['HOME'] }}/.tmux/plugins/tpm"
     update: false
 
+- name: Install TPM plugins
+  ansible.builtin.command:
+    cmd: "{{ ansible_facts['env']['HOME'] }}/.tmux/plugins/tpm/bin/install_plugins"
+  changed_when: true
+
 - name: Check if Docker is installed
   ansible.builtin.stat:
     path: /usr/bin/docker
